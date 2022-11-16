@@ -2,7 +2,7 @@
 
 ## Custom BodyType Genes
 
-To assign a custom bodytype to a gene add the mod extension to  your genedef:
+To assign a custom bodytype to a gene add this mod extension to  your genedef:
 
     <modExtensions>
 		<li Class="GeneTools.GeneToolsGeneDef">
