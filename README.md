@@ -53,14 +53,10 @@ When added to an apparel ThingDef, the above mod extension will allow only pawns
 
 If you want to allow your custom bodytype to wear a piece of vanilla apparel, you just have to patch that apparel like so:
 
-    <Operation Class="PatchOperationAddModExtension">
-	<xpath>/Defs/ThingDef[defName="Apparel_Parka"]</xpath>
+    <Operation Class="PatchOperationAdd">
+	<xpath>/Defs/ThingDef[defName="Apparel_Parka"]/modExtensions/li[@Class="GeneTools.GeneToolsApparelDef"]/allowedBodyTypes</xpath>
 	<value>
-		<li Class="GeneTools.GeneToolsApparelDef">
-			<allowedBodyTypes>
-				<li>MyBodyType</li>
-			</allowedBodyTypes>
-		</li>
+		<li>MyBodyType</li>
 	</value>
-	</Operation>
+</Operation>
 Just make sure that you have created a texture for that apparel, named properly (Parka_MyBodyType_south etc.), and in the proper folder, otherwise there will be errors.
