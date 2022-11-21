@@ -110,48 +110,51 @@ namespace GeneTools
         public static void Postfix(Pawn pawn, Thing thing, out string cantReason, ref bool __result)
         {
             cantReason = (string)null;
-            if (thing.def.IsApparel)
+            if (pawn.RaceProps.Humanlike)
             {
-                BodyTypeDef bodyType = pawn.story.bodyType;
-                bool useSubstitute = thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-                bool useSubstituteForced = thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-                bool isHat = thing.def.apparel.LastLayer == ApparelLayerDefOf.Overhead || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
-                bool isInvisible = thing.def.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || thing.def.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || thing.def.apparel.wornGraphicPath == "" ? true : false;
+                if (thing.def.IsApparel)
+                {
+                    BodyTypeDef bodyType = pawn.story.bodyType;
+                    bool useSubstitute = thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                    bool useSubstituteForced = thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                    bool isHat = thing.def.apparel.LastLayer == ApparelLayerDefOf.Overhead || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || thing.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
+                    bool isInvisible = thing.def.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || thing.def.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || thing.def.apparel.wornGraphicPath == "" ? true : false;
 
-                if (!isInvisible && !isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
-                {
-                    List<BodyTypeDef> forcedBodies = thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
-                    if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                    if (!isInvisible && !isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
                     {
-                        cantReason = (string)"does not fit " + pawn.story.bodyType + " body";
-                        __result = false;
+                        List<BodyTypeDef> forcedBodies = thing.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
+                        if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                        {
+                            cantReason = (string)"does not fit " + pawn.story.bodyType + " body";
+                            __result = false;
+                        }
                     }
-                }
-                if (!isInvisible && !isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
-                {
-                    List<BodyTypeDef> allowedBodies = thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
-                    if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                    if (!isInvisible && !isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
                     {
-                        cantReason = (string)"does not fit " + pawn.story.bodyType + " body";
-                        __result = false;
+                        List<BodyTypeDef> allowedBodies = thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
+                        if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                        {
+                            cantReason = (string)"does not fit " + pawn.story.bodyType + " body";
+                            __result = false;
+                        }
                     }
-                }
-                if (!isInvisible && isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
-                {
-                    List<HeadTypeDef> forcedHeads = thing.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
-                    if (!forcedHeads.Contains(pawn.story.headType))
+                    if (!isInvisible && isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
                     {
-                        cantReason = (string)"does not fit " + pawn.story.headType + " head";
-                        __result = false;
+                        List<HeadTypeDef> forcedHeads = thing.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
+                        if (!forcedHeads.Contains(pawn.story.headType))
+                        {
+                            cantReason = (string)"does not fit " + pawn.story.headType + " head";
+                            __result = false;
+                        }
                     }
-                }
-                if (!isInvisible && isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
-                {
-                    List<HeadTypeDef> allowedHeads = thing.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
-                    if (!allowedHeads.Contains(pawn.story.headType))
+                    if (!isInvisible && isHat && thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
                     {
-                        cantReason = (string)"does not fit " + pawn.story.headType + " head";
-                        __result = false;
+                        List<HeadTypeDef> allowedHeads = thing.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
+                        if (!allowedHeads.Contains(pawn.story.headType))
+                        {
+                            cantReason = (string)"does not fit " + pawn.story.headType + " head";
+                            __result = false;
+                        }
                     }
                 }
             }
@@ -163,41 +166,44 @@ namespace GeneTools
     {
         public static void Postfix(Pawn p, ThingDef apparel, ref bool __result)
         {
-            BodyTypeDef bodyType = p.story.bodyType;
-            bool useSubstitute = apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool useSubstituteForced = apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool isHat = apparel.apparel.LastLayer == ApparelLayerDefOf.Overhead || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
-            bool isInvisible = apparel.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || apparel.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || apparel.apparel.wornGraphicPath == "" ? true : false;
-            if (!isInvisible && !isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
+            if (p.RaceProps.Humanlike)
             {
-                List<BodyTypeDef> forcedBodies = apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
-                if (!forcedBodies.Contains(p.story.bodyType) && !useSubstituteForced)
+                BodyTypeDef bodyType = p.story.bodyType;
+                bool useSubstitute = apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool useSubstituteForced = apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool isHat = apparel.apparel.LastLayer == ApparelLayerDefOf.Overhead || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || apparel.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
+                bool isInvisible = apparel.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || apparel.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || apparel.apparel.wornGraphicPath == "" ? true : false;
+                if (!isInvisible && !isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
                 {
-                    __result = false;
+                    List<BodyTypeDef> forcedBodies = apparel.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
+                    if (!forcedBodies.Contains(p.story.bodyType) && !useSubstituteForced)
+                    {
+                        __result = false;
+                    }
                 }
-            }
-            if (!isInvisible && !isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
-            {
-                List<BodyTypeDef> allowedBodies = apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
-                if (!allowedBodies.Contains(p.story.bodyType) && !useSubstitute)
+                if (!isInvisible && !isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
                 {
-                    __result = false;
+                    List<BodyTypeDef> allowedBodies = apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
+                    if (!allowedBodies.Contains(p.story.bodyType) && !useSubstitute)
+                    {
+                        __result = false;
+                    }
                 }
-            }
-            if (!isInvisible && isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
-            {
-                List<HeadTypeDef> forcedHeads = apparel.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
-                if (!forcedHeads.Contains(p.story.headType))
+                if (!isInvisible && isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
                 {
-                    __result = false;
+                    List<HeadTypeDef> forcedHeads = apparel.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
+                    if (!forcedHeads.Contains(p.story.headType))
+                    {
+                        __result = false;
+                    }
                 }
-            }
-            if (!isInvisible && isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
-            {
-                List<HeadTypeDef> allowedHeads = apparel.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
-                if (!allowedHeads.Contains(p.story.headType))
+                if (!isInvisible && isHat && apparel.IsApparel && apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
                 {
-                    __result = false;
+                    List<HeadTypeDef> allowedHeads = apparel.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
+                    if (!allowedHeads.Contains(p.story.headType))
+                    {
+                        __result = false;
+                    }
                 }
             }
         }
@@ -208,41 +214,44 @@ namespace GeneTools
     {
         public static void Postfix(ref Pawn pawn, ref Apparel ap, ref List<float> wornScoresCache, ref float __result)
         {
-            BodyTypeDef bodyType = pawn.story.bodyType;
-            bool useSubstitute = ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool useSubstituteForced = ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool isHat = ap.def.apparel.LastLayer == ApparelLayerDefOf.Overhead || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
-            bool isInvisible = ap.def.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || ap.def.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || ap.def.apparel.wornGraphicPath == "" ? true : false;
-            if (!isInvisible && !isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
+            if (pawn.RaceProps.Humanlike)
             {
-                List<BodyTypeDef> forcedBodies = ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
-                if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                BodyTypeDef bodyType = pawn.story.bodyType;
+                bool useSubstitute = ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool useSubstituteForced = ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool isHat = ap.def.apparel.LastLayer == ApparelLayerDefOf.Overhead || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || ap.def.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
+                bool isInvisible = ap.def.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || ap.def.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || ap.def.apparel.wornGraphicPath == "" ? true : false;
+                if (!isInvisible && !isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
                 {
-                    __result = -1000f;
+                    List<BodyTypeDef> forcedBodies = ap.def.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
+                    if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                    {
+                        __result = -1000f;
+                    }
                 }
-            }
-            if (!isInvisible && !isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
-            {
-                List<BodyTypeDef> allowedBodies = ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
-                if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                if (!isInvisible && !isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
                 {
-                    __result = -1000f;
+                    List<BodyTypeDef> allowedBodies = ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
+                    if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                    {
+                        __result = -1000f;
+                    }
                 }
-            }
-            if (!isInvisible && isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
-            {
-                List<HeadTypeDef> forcedHeads = ap.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
-                if (!forcedHeads.Contains(pawn.story.headType))
+                if (!isInvisible && isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
                 {
-                    __result = -1000f;
+                    List<HeadTypeDef> forcedHeads = ap.def.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
+                    if (!forcedHeads.Contains(pawn.story.headType))
+                    {
+                        __result = -1000f;
+                    }
                 }
-            }
-            if (!isInvisible && isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
-            {
-                List<HeadTypeDef> allowedHeads = ap.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
-                if (!allowedHeads.Contains(pawn.story.headType))
+                if (!isInvisible && isHat && ap.def.IsApparel && ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
                 {
-                    __result = -1000f;
+                    List<HeadTypeDef> allowedHeads = ap.def.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
+                    if (!allowedHeads.Contains(pawn.story.headType))
+                    {
+                        __result = -1000f;
+                    }
                 }
             }
         }
@@ -253,53 +262,56 @@ namespace GeneTools
     {
         public static void Postfix(ThingStuffPair pair, Pawn pawn, float moneyLeft, bool allowHeadgear, int fixedSeed, ref bool __result)
         {
-            BodyTypeDef bodyType = pawn.story.bodyType;
-            bool useSubstitute = pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool useSubstituteForced = pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-            bool isHat = pair.thing.apparel.LastLayer == ApparelLayerDefOf.Overhead || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
-            bool isInvisible = pair.thing.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || pair.thing.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || pair.thing.apparel.wornGraphicPath == "" ? true : false;
-            if (!isInvisible && !isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
+            if (pawn.RaceProps.Humanlike)
             {
-                List<BodyTypeDef> allowedBodies = pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
-                if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                BodyTypeDef bodyType = pawn.story.bodyType;
+                bool useSubstitute = pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool useSubstituteForced = pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null && !pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                bool isHat = pair.thing.apparel.LastLayer == ApparelLayerDefOf.Overhead || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead) || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead) || pair.thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Eyes) ? true : false;
+                bool isInvisible = pair.thing.apparel.wornGraphicPath == BaseContent.PlaceholderImagePath || pair.thing.apparel.wornGraphicPath == BaseContent.PlaceholderGearImagePath || pair.thing.apparel.wornGraphicPath == "" ? true : false;
+                if (!isInvisible && !isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null)
                 {
-                    pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
-                    __result = false;
+                    List<BodyTypeDef> allowedBodies = pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes;
+                    if (!allowedBodies.Contains(pawn.story.bodyType) && !useSubstitute)
+                    {
+                        pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
+                        __result = false;
+                    }
+                    else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
                 }
-                else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
-            }
 
-            if (!isInvisible && !isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
-            {
-                List<BodyTypeDef> forcedBodies = pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
-                if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                if (!isInvisible && !isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes != null)
                 {
-                    pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
-                    __result = false;
+                    List<BodyTypeDef> forcedBodies = pair.thing.GetModExtension<GeneToolsApparelDef>().forcedBodyTypes;
+                    if (!forcedBodies.Contains(pawn.story.bodyType) && !useSubstituteForced)
+                    {
+                        pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
+                        __result = false;
+                    }
+                    else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
                 }
-                else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
-            }
 
-            if (!isInvisible && isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
-            {
-                List<HeadTypeDef> allowedHeads = pair.thing.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
-                if (!allowedHeads.Contains(pawn.story.headType))
+                if (!isInvisible && isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes != null)
                 {
-                    pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
-                    __result = false;
+                    List<HeadTypeDef> allowedHeads = pair.thing.GetModExtension<GeneToolsApparelDef>().allowedHeadTypes;
+                    if (!allowedHeads.Contains(pawn.story.headType))
+                    {
+                        pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
+                        __result = false;
+                    }
+                    else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
                 }
-                else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
-            }
 
-            if (!isInvisible && isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
-            {
-                List<HeadTypeDef> forcedHeads = pair.thing.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
-                if (!forcedHeads.Contains(pawn.story.headType))
+                if (!isInvisible && isHat && pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes != null)
                 {
-                    pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
-                    __result = false;
+                    List<HeadTypeDef> forcedHeads = pair.thing.GetModExtension<GeneToolsApparelDef>().forcedHeadTypes;
+                    if (!forcedHeads.Contains(pawn.story.headType))
+                    {
+                        pair.thing.apparel.canBeGeneratedToSatisfyWarmth = false;
+                        __result = false;
+                    }
+                    else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
                 }
-                else { pair.thing.apparel.canBeGeneratedToSatisfyWarmth = true; }
             }
         }
 
@@ -311,29 +323,34 @@ namespace GeneTools
             [HarmonyPostfix]
             public static bool Prefix(ref PawnGraphicSet __instance)
             {
-                __instance.ClearCache();
-                __instance.apparelGraphics.Clear();
-                using (List<Apparel>.Enumerator enumerator = __instance.pawn.apparel.WornApparel.GetEnumerator())
+                if (__instance.pawn.RaceProps.Humanlike)
                 {
                     bool fixedGraphic = false;
-                    while (enumerator.MoveNext())
+                    __instance.ClearCache();
+                    __instance.apparelGraphics.Clear();
+                    using (List<Apparel>.Enumerator enumerator = __instance.pawn.apparel.WornApparel.GetEnumerator())
                     {
-                        ApparelGraphicRecord item;
-                        Apparel apparel = enumerator.Current;
-                        BodyTypeDef bodyType = __instance.pawn.story.bodyType;
-                        bool useSubstitute = apparel.def.HasModExtension<GeneToolsApparelDef>() && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-                        if (useSubstitute && ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody, out item))
+
+                        while (enumerator.MoveNext())
                         {
-                            __instance.apparelGraphics.Add(item);
-                            fixedGraphic = true;
+                            ApparelGraphicRecord item;
+                            Apparel apparel = enumerator.Current;
+                            BodyTypeDef bodyType = __instance.pawn.story.bodyType;
+                            bool useSubstitute = apparel.def.HasModExtension<GeneToolsApparelDef>() && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                            if (useSubstitute && ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody, out item))
+                            {
+                                __instance.apparelGraphics.Add(item);
+                                fixedGraphic = true;
+                            }
+                            else if (ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, __instance.pawn.story.bodyType, out item))
+                            {
+                                __instance.apparelGraphics.Add(item);
+                            }
                         }
-                        else if (ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, __instance.pawn.story.bodyType, out item))
-                        {
-                            __instance.apparelGraphics.Add(item);
-                        }
+                        return !fixedGraphic;
                     }
-                    return !fixedGraphic;
                 }
+                return true;
             }
         }
 
