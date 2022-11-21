@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using RimWorld;
 using Verse;
-using UnityEngine;
 
 namespace GeneTools
 {
@@ -11,17 +10,26 @@ namespace GeneTools
         public List<BodyTypeDef> forcedBodyTypesFemale;
         public List<BodyTypeDef> forcedBodyTypesBaby;
         public List<BodyTypeDef> forcedBodyTypesChild;
+
+        public List<HeadTypeDef> forcedHeadTypes;
+        public List<HeadTypeDef> forcedHeadTypesFemale;
+        public List<HeadTypeDef> forcedHeadTypesBaby;
+        public List<HeadTypeDef> forcedHeadTypesChild;
     }
 
     public class GeneToolsApparelDef : DefModExtension
     {
         public List<BodyTypeDef> forcedBodyTypes;
         public List<BodyTypeDef> allowedBodyTypes;
+        public List<HeadTypeDef> forcedHeadTypes;
+        public List<HeadTypeDef> allowedHeadTypes;
+
     }
 
     public class GeneToolsBodyTypeDef : DefModExtension
     {
         public bool colorBody = true;
+        public BodyTypeDef substituteBody;
         public bool useShader;
     }
     public class GeneToolsHeadTypeDef : DefModExtension

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+<Operation Class="PatchOperationAddModExtension">
+	<xpath>/Defs/ThingDef[defName= *]</xpath>
+	<value>
+		<li Class="GeneTools.GeneToolsApparelDef">
+			<allowedBodyTypes>
+				<li>Child</li>
+				<li>Male</li>
+				<li>Female</li>
+				<li>Thin</li>
+				<li>Fat</li>
+				<li>Hulk</li>
+			</allowedBodyTypes>
+			<allowedHeadTypes>
+				<li>Skull</li>
+				<li>Stump</li>
+				<li>Male_AverageNormal</li>
+				<li>Male_AveragePointy</li>
+				<li>Male_AverageWide</li>
+				<li>Male_NarrowNormal</li>
+				<li>Male_NarrowPointy</li>
+				<li>Male_NarrowWide</li>
+				<li>Female_AverageNormal</li>
+				<li>Female_AveragePointy</li>
+				<li>Female_AverageWide</li>
+				<li>Female_NarrowNormal</li>
+				<li>Female_NarrowPointy</li>
+				<li>Female_NarrowWide</li>
+				<li>Gaunt</li>
+				<li>Male_HeavyJawNormal</li>
+				<li>Female_HeavyJawNormal</li>
+				<li>Furskin_Average1</li>
+				<li>Furskin_Average2</li>
+				<li>Furskin_Average3</li>
+				<li>Furskin_Gaunt</li>
+				<li>Furskin_Narrow1</li>
+				<li>Furskin_Narrow2</li>
+				<li>Furskin_Narrow3</li>
+				<li>Furskin_Heavy1</li>
+				<li>Furskin_Heavy2</li>
+				<li>Furskin_Heavy3</li>
+			</allowedHeadTypes>
+		</li>
+	</value>
+</Operation>
+</Patch>
