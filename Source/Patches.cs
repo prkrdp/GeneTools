@@ -3,14 +3,16 @@ using RimWorld;
 using System.Collections.Generic;
 using Verse;
 using UnityEngine;
+using System;
+using RimWorld.QuestGen;
 
 namespace GeneTools
 {
-    [HarmonyPatch(typeof(PawnGenerator), "GetBodyTypeFor")] /* Set body type to any forced by genes */
-    public static class AddPawnBody
+    /* Set body type to any forced by genes */
+    public static class GtGetBodyTypeFor
     {
         [HarmonyPostfix]
-        public static void PostFix(Pawn pawn, ref BodyTypeDef __result)
+        public static void Postfix(Pawn pawn, ref BodyTypeDef __result)
         {
             List<Gene> genesListForReading = pawn.genes.GenesListForReading;
             foreach (Gene gene in genesListForReading)
@@ -57,8 +59,8 @@ namespace GeneTools
     }
 
 
-    [HarmonyPatch(typeof(Pawn_GeneTracker), "Notify_GenesChanged")] /* Update body if genes are changed */
-    public static class CheckForGeneChange
+    /* Update body if genes are changed */
+    public static class GtNotify_GenesChanged
     {
         [HarmonyPostfix]
         public static void Postfix(ref Pawn ___pawn, GeneDef addedOrRemovedGene)
@@ -72,13 +74,14 @@ namespace GeneTools
         }
     }
 
-    [HarmonyPatch(typeof(PawnGraphicSet), "ResolveAllGraphics")] /* Apply shader changes to body and head */
-    public static class BodyColorPatch
+
+    /* Apply changes to body and head */
+    public static class GtResolveAllGraphics
     {
+        
         [HarmonyPostfix]
-        public static void ResolveAllGraphics(PawnGraphicSet __instance)
+        public static void Postfix(PawnGraphicSet __instance)
         {
-            
             if (__instance.pawn.RaceProps.Humanlike)
             {
                 Color skinColor = __instance.pawn.story.SkinColor;
@@ -104,15 +107,17 @@ namespace GeneTools
         }
     }
 
-    [HarmonyPatch(typeof(EquipmentUtility), "CanEquip", new System.Type[] { typeof(Thing), typeof(Pawn), typeof(string), typeof(bool) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Out, ArgumentType.Normal })]
-    public static class ApparelEquipRestriction /* Prevent player from making pawn equip apparel that doesn't fit the body */
+    /* Prevent player from making pawn equip apparel that doesn't fit the body */
+    public static class GtCanEquip 
     {
-        public static void Postfix(Pawn pawn, Thing thing, out string cantReason, ref bool __result)
+        [HarmonyPostfix]
+        public static void Postfix(ref Thing thing, ref Pawn pawn, out string cantReason, ref bool __result)
         {
             cantReason = (string)null;
+            bool apparelChecking = GeneToolsSettings.forcedApparelChecking;
             if (pawn.RaceProps.Humanlike)
             {
-                if (thing.def.IsApparel)
+                if (thing.def.IsApparel && apparelChecking)
                 {
                     BodyTypeDef bodyType = pawn.story.bodyType;
                     bool useSubstitute = thing.def.HasModExtension<GeneToolsApparelDef>() && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && thing.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
@@ -158,15 +163,18 @@ namespace GeneTools
                     }
                 }
             }
+
         }
     }
 
-    [HarmonyPatch(typeof(ApparelRequirement), "AllowedForPawn")]
-    public static class ApparelAllowedRestriction /* Check if apparel can be used for a pawn kind */
+    /* Check if apparel can be used for a pawn kind */
+    public static class GtAllowedForPawn 
     {
+        [HarmonyPostfix]
         public static void Postfix(Pawn p, ThingDef apparel, ref bool __result)
         {
-            if (p.RaceProps.Humanlike)
+            bool apparelChecking = GeneToolsSettings.spawnApparelChecking;
+            if (p.RaceProps.Humanlike && apparelChecking)
             {
                 BodyTypeDef bodyType = p.story.bodyType;
                 bool useSubstitute = apparel.HasModExtension<GeneToolsApparelDef>() && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
@@ -209,12 +217,14 @@ namespace GeneTools
         }
     }
 
-    [HarmonyPatch(typeof(JobGiver_OptimizeApparel), "ApparelScoreGain")] /* Prevent pawns from equiping clothes themselves that don't fit */
-    internal static class ApparelScoreRestriction 
+    /* Prevent pawns from equiping clothes themselves that don't fit */
+    internal static class GtApparelScoreGain
     {
+        [HarmonyPostfix]
         public static void Postfix(ref Pawn pawn, ref Apparel ap, ref List<float> wornScoresCache, ref float __result)
         {
-            if (pawn.RaceProps.Humanlike)
+            bool apparelChecking = GeneToolsSettings.autoApparelChecking;
+            if (pawn.RaceProps.Humanlike && apparelChecking)
             {
                 BodyTypeDef bodyType = pawn.story.bodyType;
                 bool useSubstitute = ap.def.HasModExtension<GeneToolsApparelDef>() && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && ap.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
@@ -257,12 +267,14 @@ namespace GeneTools
         }
     }
 
-    [HarmonyPatch(typeof(PawnApparelGenerator), "CanUsePair")] /* Prevent pawns from spawning in with apparel that doesn't fit */
-    internal static class StartingApparelRestriction
+    /* Prevent pawns from spawning in with apparel that doesn't fit */
+    internal static class GtCanUsePair
     {
+        [HarmonyPostfix]
         public static void Postfix(ThingStuffPair pair, Pawn pawn, float moneyLeft, bool allowHeadgear, int fixedSeed, ref bool __result)
         {
-            if (pawn.RaceProps.Humanlike)
+            bool apparelChecking = GeneToolsSettings.spawnApparelChecking;
+            if (pawn.RaceProps.Humanlike && apparelChecking)
             {
                 BodyTypeDef bodyType = pawn.story.bodyType;
                 bool useSubstitute = pair.thing.HasModExtension<GeneToolsApparelDef>() && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && pair.thing.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
@@ -317,41 +329,41 @@ namespace GeneTools
 
     }
 
-        [HarmonyPatch(typeof(PawnGraphicSet), "ResolveApparelGraphics")]  /* Allow body to use substitute apparel texture if available */
-        public static class UseSubstituteBody
+    /* Allow body to use substitute apparel texture if available */
+    public static class GtResolveApparelGraphics
+    {
+        [HarmonyPrefix]
+        public static bool Prefix(ref PawnGraphicSet __instance)
         {
-            [HarmonyPostfix]
-            public static bool Prefix(ref PawnGraphicSet __instance)
+            bool fixedGraphic = false;
+            if (__instance.pawn.RaceProps.Humanlike)
             {
-                if (__instance.pawn.RaceProps.Humanlike)
+                __instance.ClearCache();
+                __instance.apparelGraphics.Clear();
+                using (List<Apparel>.Enumerator enumerator = __instance.pawn.apparel.WornApparel.GetEnumerator())
                 {
-                    bool fixedGraphic = false;
-                    __instance.ClearCache();
-                    __instance.apparelGraphics.Clear();
-                    using (List<Apparel>.Enumerator enumerator = __instance.pawn.apparel.WornApparel.GetEnumerator())
-                    {
 
-                        while (enumerator.MoveNext())
+                    while (enumerator.MoveNext())
+                    {
+                        ApparelGraphicRecord item;
+                        Apparel apparel = enumerator.Current;
+                        BodyTypeDef bodyType = __instance.pawn.story.bodyType;
+                        bool useSubstitute = apparel.def.HasModExtension<GeneToolsApparelDef>() && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
+                        if (useSubstitute && ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody, out item))
                         {
-                            ApparelGraphicRecord item;
-                            Apparel apparel = enumerator.Current;
-                            BodyTypeDef bodyType = __instance.pawn.story.bodyType;
-                            bool useSubstitute = apparel.def.HasModExtension<GeneToolsApparelDef>() && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes != null && !apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType) && bodyType.HasModExtension<GeneToolsBodyTypeDef>() && bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody != null && apparel.def.GetModExtension<GeneToolsApparelDef>().allowedBodyTypes.Contains(bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody) ? true : false;
-                            if (useSubstitute && ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, bodyType.GetModExtension<GeneToolsBodyTypeDef>().substituteBody, out item))
-                            {
-                                __instance.apparelGraphics.Add(item);
-                                fixedGraphic = true;
-                            }
-                            else if (ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, __instance.pawn.story.bodyType, out item))
-                            {
-                                __instance.apparelGraphics.Add(item);
-                            }
+                            __instance.apparelGraphics.Add(item);
+                            fixedGraphic = true;
                         }
-                        return !fixedGraphic;
+                        else if (ApparelGraphicRecordGetter.TryGetGraphicApparel(enumerator.Current, __instance.pawn.story.bodyType, out item))
+                        {
+                            __instance.apparelGraphics.Add(item);
+                        }
                     }
+                    
                 }
-                return true;
             }
+            return !fixedGraphic;
         }
+    }
 
 }
